@@ -1,57 +1,90 @@
 body {
-    background: #dff5f5;
-    font-family: 'Noto Sans', Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    text-align: center;
+    font-family: 'Noto Sans', Arial, sans-serif;
+    background: #dff5f5 url('default_background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    transition: background 1s, color 1s;
+    color: #333;
+  }
+  
+  .dark-mode {
+    background: #121212;
+    color: #eee;
   }
   
   h1, h2, h3, h4 {
     margin-bottom: 10px;
   }
   
-  input {
+  input, button {
     margin: 5px;
     padding: 10px;
     border-radius: 10px;
     border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  
+  input {
+    width: 70%;
   }
   
   button {
-    padding: 10px 20px;
-    margin: 5px;
-    border-radius: 10px;
     background-color: #4caf50;
     color: white;
-    border: none;
     cursor: pointer;
-    font-size: 16px;
+    transition: background 0.3s;
   }
   
   button:hover {
     background-color: #45a049;
   }
   
+  #auth-section, #chat-section, #admin-login {
+    text-align: center;
+  }
+  
   #messages {
     list-style-type: none;
     margin: 20px auto;
-    padding: 0;
-    width: 80%;
-    max-width: 500px;
-    height: 300px;
-    overflow-y: scroll;
-    background: white;
-    border-radius: 10px;
+    padding: 10px;
+    width: 90%;
+    max-width: 600px;
+    height: 400px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 15px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
   
   #messages li {
     padding: 8px;
     border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 16px;
+    word-wrap: break-word;
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   
   #chat-form {
     margin-top: 20px;
+  }
+  
+  #messageInput {
+    width: 70%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #aaa;
+  }
+  
+  #chat-form button {
+    padding: 12px 20px;
   }
   
   #admin-button {
@@ -62,20 +95,27 @@ body {
   }
   
   #theme-buttons {
-    margin-top: 10px;
+    margin-top: 15px;
   }
   
   #theme-buttons button {
-    background-color: #2196F3;
+    background-color: #2196f3;
   }
   
   #theme-buttons button:hover {
-    background-color: #1976D2;
+    background-color: #1976d2;
+  }
+  
+  #darkmode-toggle {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background-color: #333;
   }
   
   #show-users-button {
     position: fixed;
-    bottom: 80px;
+    bottom: 140px;
     right: 20px;
     background-color: #673ab7;
   }
@@ -85,7 +125,7 @@ body {
     position: absolute;
     top: 100px;
     right: 50px;
-    background: rgba(255,255,255,0.95);
+    background: rgba(255, 255, 255, 0.95);
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 15px;
@@ -93,10 +133,6 @@ body {
     text-align: left;
     z-index: 1000;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  }
-  
-  #online-users h4 {
-    margin-top: 0;
   }
   
   #admin-panel {

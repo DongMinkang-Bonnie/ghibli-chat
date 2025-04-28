@@ -3,18 +3,19 @@ const socket = io();
 const form = document.getElementById('chat-form');
 const input = document.getElementById('messageInput');
 const messages = document.getElementById('messages');
-const onlineList = document.getElementById('online-users'); // 추가된 부분
+const userList = document.getElementById('user-list-content');
+
 let currentUserNickname = '';
 let currentUserId = '';
 
-// 로그인/회원가입 후 서버에 접속 정보 알림
+// 로그인 성공 시 서버에 유저 정보 보내기
 function connectUser(nickname, id) {
   currentUserNickname = nickname;
   currentUserId = id;
   socket.emit('user connected', { nickname, id });
 }
 
-// 로컬 저장소에서 채팅 기록 불러오기
+// 새로고침시 로컬 저장된 채팅 불러오기
 function loadMessages() {
   const saved = localStorage.getItem('chatMessages');
   if (saved) {
@@ -23,7 +24,6 @@ function loadMessages() {
   }
 }
 
-// 새로고침 시 메시지 불러오기
 window.onload = loadMessages;
 
 // 채팅 메시지 전송
@@ -35,7 +35,7 @@ form.addEventListener('submit', function(e) {
   }
 });
 
-// 서버로부터 채팅 메시지 수신
+// 서버로부터 채팅 수신
 socket.on('chat message', function(msg) {
   const item = document.createElement('li');
   item.textContent = msg;
@@ -44,42 +44,56 @@ socket.on('chat message', function(msg) {
   localStorage.setItem('chatMessages', messages.innerHTML);
 });
 
-// 서버로부터 전체 메시지 삭제 명령 수신
+// 전체 삭제 명령 수신
 socket.on('admin delete all', () => {
   messages.innerHTML = '';
   localStorage.removeItem('chatMessages');
 });
 
-// 서버로부터 배경 변경 명령 수신
+// 배경 테마 변경 명령 수신
 socket.on('admin background change', (theme) => {
-  document.body.style.backgroundImage = `url(${theme})`;
+  if (theme === 'spring') {
+    document.body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2020/04/10/11/36/cherry-blossom-5024676_960_720.jpg')";
+  } else if (theme === 'summer') {
+    document.body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2017/07/27/20/50/summer-2543238_960_720.jpg')";
+  } else if (theme === 'autumn') {
+    document.body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2015/11/02/14/03/autumn-1016985_960_720.jpg')";
+  } else if (theme === 'winter') {
+    document.body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2016/11/18/15/02/winter-1837437_960_720.jpg')";
+  } else if (theme === 'rain') {
+    particlesRain();
+  } else if (theme === 'snow') {
+    particlesSnow();
+  } else if (theme === 'morning') {
+    document.body.style.backgroundColor = "#dff5f5";
+  } else if (theme === 'day') {
+    document.body.style.backgroundColor = "#aee1f9";
+  } else if (theme === 'evening') {
+    document.body.style.backgroundColor = "#ffa07a";
+  } else if (theme === 'night') {
+    document.body.style.backgroundColor = "#2c3e50";
+  }
 });
 
-// 서버로부터 전체 공지 수신
+// 공지사항 수신
 socket.on('admin announce', (announcement) => {
   alert(`📢 관리자 공지: ${announcement}`);
 });
 
-// 강퇴 당했을 때
+// 강퇴 명령 수신
 socket.on('admin kick', () => {
   alert('⚠️ 강퇴당했습니다.');
   location.reload();
 });
 
-// 벤(Ban) 당했을 때
-socket.on('admin ban', () => {
-  alert('🚫 벤당했습니다. 더 이상 입장할 수 없습니다.');
-  location.reload();
-});
-
 // 서버로부터 접속자 리스트 수신
 socket.on('update user list', (users) => {
-  if (onlineList) {
-    onlineList.innerHTML = '<h4>접속자 목록</h4>';
+  if (userList) {
+    userList.innerHTML = '';
     users.forEach(user => {
       const item = document.createElement('div');
       item.textContent = `👤 ${user.nickname}`;
-      onlineList.appendChild(item);
+      userList.appendChild(item);
     });
   }
 });

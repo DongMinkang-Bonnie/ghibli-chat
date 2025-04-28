@@ -2,16 +2,18 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>놀러와요 동무의 숲</title>
+  <title>놀러와요 동무의 숲 - 지브리 에디션</title>
   <link rel="stylesheet" href="style.css">
   <script src="/socket.io/socket.io.js"></script>
+  <script src="particles.js" defer></script>
   <script src="socket.js" defer></script>
   <script src="admin.js" defer></script>
 </head>
 <body>
 
+<!-- 로그인/회원가입 화면 -->
 <div id="auth-section">
-  <h1>놀러와요 동무의 숲</h1>
+  <h1>🌳 놀러와요 동무의 숲 🌳</h1>
   <div id="signup">
     <h2>회원가입</h2>
     <input id="signup-id" placeholder="아이디"><br>
@@ -26,8 +28,15 @@
     <input id="login-password" type="password" placeholder="비밀번호"><br>
     <button onclick="login()">로그인</button>
   </div>
+
+  <div id="recover">
+    <h3>비밀번호 찾기</h3>
+    <input id="recover-id" placeholder="아이디 입력"><br>
+    <button onclick="recoverPassword()">비밀번호 찾기</button>
+  </div>
 </div>
 
+<!-- 채팅방 화면 -->
 <div id="chat-section" style="display:none;">
   <h2 id="welcome-text"></h2>
 
@@ -41,13 +50,22 @@
   <!-- 관리자 모드 버튼 -->
   <button id="admin-button" onclick="openAdminLogin()">🔒</button>
 
-  <!-- 테마 변경 버튼들 -->
+  <!-- 테마 변경 버튼 -->
   <div id="theme-buttons">
+    <button onclick="changeTheme('spring')">🌸 봄</button>
+    <button onclick="changeTheme('summer')">☀️ 여름</button>
+    <button onclick="changeTheme('autumn')">🍁 가을</button>
+    <button onclick="changeTheme('winter')">❄️ 겨울</button>
     <button onclick="changeTheme('rain')">☔ 비</button>
-    <button onclick="changeTheme('snow')">❄️ 눈</button>
-    <button onclick="changeTheme('flowers')">🌸 꽃</button>
-    <button onclick="changeTheme('wind')">🍃 바람</button>
+    <button onclick="changeTheme('snow')">🌨️ 눈</button>
+    <button onclick="changeTime('morning')">🌅 아침</button>
+    <button onclick="changeTime('day')">🌞 낮</button>
+    <button onclick="changeTime('evening')">🌇 저녁</button>
+    <button onclick="changeTime('night')">🌙 밤</button>
   </div>
+
+  <!-- 다크모드 토글 버튼 -->
+  <button id="darkmode-toggle" onclick="toggleDarkMode()">🌑 다크모드</button>
 
   <!-- 접속자 보기 버튼 -->
   <button id="show-users-button" onclick="toggleUserList()">👥 접속자 보기</button>
@@ -67,13 +85,14 @@
   </div>
 </div>
 
-<!-- 관리자 비밀번호 입력창 -->
+<!-- 관리자 로그인 입력창 -->
 <div id="admin-login" style="display:none;">
   <h3>관리자 로그인</h3>
   <input id="admin-password" type="password" placeholder="비밀번호 입력">
   <button onclick="verifyAdmin()">확인</button>
 </div>
 
+<!-- 기본 스크립트 로직 -->
 <script>
 function signup() {
   const id = document.getElementById('signup-id').value;
@@ -115,6 +134,23 @@ function login() {
   });
 }
 
+function recoverPassword() {
+  const id = document.getElementById('recover-id').value;
+
+  fetch('/recover', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(`임시 비밀번호: ${data.tempPassword}`);
+  })
+  .catch(err => {
+    alert('비밀번호 찾기 실패: ' + err.message);
+  });
+}
+
 function openAdminLogin() {
   document.getElementById('admin-login').style.display = 'block';
 }
@@ -130,13 +166,11 @@ function verifyAdmin() {
   }
 }
 
-// 접속자 목록 토글
 function toggleUserList() {
   const list = document.getElementById('online-users');
   list.style.display = list.style.display === 'none' ? 'block' : 'none';
 }
 
-// 접속자 목록 고정
 function pinUserList() {
   const list = document.getElementById('online-users');
   list.style.position = 'fixed';
@@ -144,21 +178,16 @@ function pinUserList() {
   list.style.right = '10px';
 }
 
-// 배경 테마 변경
-function changeTheme(theme) {
-  let themeUrl = '';
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+}
 
-  if (theme === 'rain') {
-    themeUrl = 'https://cdn.pixabay.com/photo/2015/10/28/15/51/rain-1015609_960_720.jpg';
-  } else if (theme === 'snow') {
-    themeUrl = 'https://cdn.pixabay.com/photo/2017/01/18/15/44/snow-1997281_960_720.jpg';
-  } else if (theme === 'flowers') {
-    themeUrl = 'https://cdn.pixabay.com/photo/2017/08/01/08/29/flowers-2566240_960_720.jpg';
-  } else if (theme === 'wind') {
-    themeUrl = 'https://cdn.pixabay.com/photo/2016/09/21/11/34/landscape-1685431_960_720.jpg';
-  }
+function changeTheme(season) {
+  socket.emit('admin background change', season);
+}
 
-  socket.emit('admin background change', themeUrl);
+function changeTime(time) {
+  socket.emit('admin background change', time);
 }
 </script>
 
