@@ -33,6 +33,16 @@ app.post('/signup', (req, res) => {
   res.send('회원가입 성공');
 });
 
+// 비밀번호 변경
+app.post('/change-password', (req, res) => {
+  const { id, oldPassword, newPassword } = req.body;
+  const user = users[id];
+  if (!user) return res.status(400).send('존재하지 않는 아이디입니다.');
+  if (user.password !== oldPassword) return res.status(400).send('기존 비밀번호가 틀렸습니다.');
+  user.password = newPassword;
+  res.send('비밀번호가 성공적으로 변경되었습니다!');
+});
+
 // 로그인
 app.post('/login', (req, res) => {
   const { id, password } = req.body;
