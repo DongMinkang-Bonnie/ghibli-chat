@@ -3,94 +3,164 @@
 <head>
   <meta charset="UTF-8">
   <title>놀러와요 동무의 숲</title>
-  <style>
-    body {
-      background-color: #dff5f5;
-      text-align: center;
-      font-family: "Noto Sans", "Arial", sans-serif;
-    }
-    #messages {
-      list-style: none;
-      padding: 0;
-      max-width: 400px;
-      margin: 20px auto;
-      text-align: left;
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      overflow-y: auto;
-      max-height: 300px;
-    }
-    #messages li {
-      margin-bottom: 10px;
-      word-wrap: break-word;
-    }
-    #chatForm {
-      margin-top: 20px;
-    }
-    input[type="text"] {
-      padding: 10px;
-      width: 200px;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 10px 20px;
-      border-radius: 20px;
-      border: none;
-      background-color: #4caf50;
-      color: white;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="socket.js" defer></script>
+  <script src="admin.js" defer></script>
 </head>
 <body>
-  <h1>놀러와요 동무의 숲에 오신 걸 환영합니다!</h1>
+
+<div id="auth-section">
+  <h1>놀러와요 동무의 숲</h1>
+  <div id="signup">
+    <h2>회원가입</h2>
+    <input id="signup-id" placeholder="아이디"><br>
+    <input id="signup-password" type="password" placeholder="비밀번호"><br>
+    <input id="signup-nickname" placeholder="닉네임"><br>
+    <button onclick="signup()">회원가입</button>
+  </div>
+
+  <div id="login">
+    <h2>로그인</h2>
+    <input id="login-id" placeholder="아이디"><br>
+    <input id="login-password" type="password" placeholder="비밀번호"><br>
+    <button onclick="login()">로그인</button>
+  </div>
+</div>
+
+<div id="chat-section" style="display:none;">
+  <h2 id="welcome-text"></h2>
 
   <ul id="messages"></ul>
 
-  <form id="chatForm">
+  <form id="chat-form">
     <input id="messageInput" autocomplete="off" placeholder="메시지를 입력하세요" />
-    <button>보내기</button>
+    <button type="submit">보내기</button>
   </form>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const form = document.getElementById('chatForm');
-    const input = document.getElementById('messageInput');
-    const messages = document.getElementById('messages');
+  <!-- 관리자 모드 버튼 -->
+  <button id="admin-button" onclick="openAdminLogin()">🔒</button>
 
-    function saveMessages() {
-      localStorage.setItem('chatMessages', messages.innerHTML);
-    }
+  <!-- 테마 변경 버튼들 -->
+  <div id="theme-buttons">
+    <button onclick="changeTheme('rain')">☔ 비</button>
+    <button onclick="changeTheme('snow')">❄️ 눈</button>
+    <button onclick="changeTheme('flowers')">🌸 꽃</button>
+    <button onclick="changeTheme('wind')">🍃 바람</button>
+  </div>
 
-    function loadMessages() {
-      const saved = localStorage.getItem('chatMessages');
-      if (saved) {
-        messages.innerHTML = saved;
-      }
-    }
+  <!-- 접속자 보기 버튼 -->
+  <button id="show-users-button" onclick="toggleUserList()">👥 접속자 보기</button>
 
-    loadMessages();
+  <!-- 접속자 목록 팝업 -->
+  <div id="online-users" style="display:none;">
+    <button onclick="pinUserList()">📌 고정하기</button>
+    <div id="user-list-content"></div>
+  </div>
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      if (input.value) {
-        socket.emit('chat message', input.value);
-        input.value = '';
-      }
-    });
+  <!-- 관리자 패널 (숨겨진 화면) -->
+  <div id="admin-panel" style="display:none;">
+    <h3>관리자 패널</h3>
+    <button onclick="deleteAllMessages()">전체 대화 삭제</button>
+    <button onclick="sendAnnouncement()">공지 보내기</button>
+    <button onclick="lockRoom()">방 잠금/해제</button>
+  </div>
+</div>
 
-    socket.on('chat message', function(msg) {
-      const item = document.createElement('li');
-      item.textContent = msg;
-      messages.appendChild(item);
-      saveMessages();
-      // 자동 스크롤
-      messages.scrollTop = messages.scrollHeight;
-    });
-  </script>
+<!-- 관리자 비밀번호 입력창 -->
+<div id="admin-login" style="display:none;">
+  <h3>관리자 로그인</h3>
+  <input id="admin-password" type="password" placeholder="비밀번호 입력">
+  <button onclick="verifyAdmin()">확인</button>
+</div>
+
+<script>
+function signup() {
+  const id = document.getElementById('signup-id').value;
+  const password = document.getElementById('signup-password').value;
+  const nickname = document.getElementById('signup-nickname').value;
+
+  fetch('/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, password, nickname })
+  })
+  .then(res => res.text())
+  .then(msg => {
+    alert(msg);
+  })
+  .catch(err => {
+    alert('회원가입 실패: ' + err.message);
+  });
+}
+
+function login() {
+  const id = document.getElementById('login-id').value;
+  const password = document.getElementById('login-password').value;
+
+  fetch('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, password })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('chat-section').style.display = 'block';
+    document.getElementById('welcome-text').innerText = `${data.nickname}님 환영합니다!`;
+    connectUser(data.nickname, id);
+  })
+  .catch(err => {
+    alert('로그인 실패: ' + err.message);
+  });
+}
+
+function openAdminLogin() {
+  document.getElementById('admin-login').style.display = 'block';
+}
+
+function verifyAdmin() {
+  const password = document.getElementById('admin-password').value;
+  if (password === '75271356') {
+    document.getElementById('admin-login').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    alert('관리자 모드 진입 성공!');
+  } else {
+    alert('비밀번호가 틀렸습니다.');
+  }
+}
+
+// 접속자 목록 토글
+function toggleUserList() {
+  const list = document.getElementById('online-users');
+  list.style.display = list.style.display === 'none' ? 'block' : 'none';
+}
+
+// 접속자 목록 고정
+function pinUserList() {
+  const list = document.getElementById('online-users');
+  list.style.position = 'fixed';
+  list.style.top = '10px';
+  list.style.right = '10px';
+}
+
+// 배경 테마 변경
+function changeTheme(theme) {
+  let themeUrl = '';
+
+  if (theme === 'rain') {
+    themeUrl = 'https://cdn.pixabay.com/photo/2015/10/28/15/51/rain-1015609_960_720.jpg';
+  } else if (theme === 'snow') {
+    themeUrl = 'https://cdn.pixabay.com/photo/2017/01/18/15/44/snow-1997281_960_720.jpg';
+  } else if (theme === 'flowers') {
+    themeUrl = 'https://cdn.pixabay.com/photo/2017/08/01/08/29/flowers-2566240_960_720.jpg';
+  } else if (theme === 'wind') {
+    themeUrl = 'https://cdn.pixabay.com/photo/2016/09/21/11/34/landscape-1685431_960_720.jpg';
+  }
+
+  socket.emit('admin background change', themeUrl);
+}
+</script>
+
 </body>
 </html>

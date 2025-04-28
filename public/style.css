@@ -1,0 +1,122 @@
+body {
+    background: #dff5f5;
+    font-family: 'Noto Sans', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  h1, h2, h3, h4 {
+    margin-bottom: 10px;
+  }
+  
+  input {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  #messages {
+    list-style-type: none;
+    margin: 20px auto;
+    padding: 0;
+    width: 80%;
+    max-width: 500px;
+    height: 300px;
+    overflow-y: scroll;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  #messages li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  #chat-form {
+    margin-top: 20px;
+  }
+  
+  #admin-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff9800;
+  }
+  
+  #theme-buttons {
+    margin-top: 10px;
+  }
+  
+  #theme-buttons button {
+    background-color: #2196F3;
+  }
+  
+  #theme-buttons button:hover {
+    background-color: #1976D2;
+  }
+  
+  #show-users-button {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background-color: #673ab7;
+  }
+  
+  #online-users {
+    display: none;
+    position: absolute;
+    top: 100px;
+    right: 50px;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    text-align: left;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  }
+  
+  #online-users h4 {
+    margin-top: 0;
+  }
+  
+  #admin-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  }
+  
+  #admin-login {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  }
+  
