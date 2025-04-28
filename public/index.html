@@ -3,30 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <title>지브리 채팅방</title>
-  <script src="/socket.io/socket.io.js"></script> <!-- 소켓 연결 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body {
+      background-color: #e0f7fa;
+      font-family: 'Arial', 'Apple SD Gothic Neo', 'Pretendard', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1 {
+      margin-top: 50px;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    ul#messages {
+      list-style-type: none;
+      padding: 0;
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto 0;
+      text-align: left;
+    }
+
+    ul#messages li {
+      background: #ffffff;
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      word-break: break-word;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    form {
+      margin-top: auto;
+      margin-bottom: 50px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    input#input {
+      padding: 12px 20px;
+      border: 2px solid #00acc1;
+      border-radius: 20px;
+      outline: none;
+      font-size: 1rem;
+      width: 250px;
+      transition: 0.2s;
+    }
+
+    input#input:focus {
+      border-color: #007c91;
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: #00acc1;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #007c91;
+    }
+  </style>
 </head>
-<body style="background-color: #e0f7fa; text-align: center; margin-top: 50px;">
+<body>
 
   <h1>지브리 채팅방에 오신 걸 환영합니다!</h1>
 
   <ul id="messages"></ul>
 
-  <form id="form" action="">
+  <form id="form" action="javascript:void(0);">
     <input id="input" autocomplete="off" placeholder="메시지를 입력하세요" />
     <button>보내기</button>
   </form>
 
   <script>
-    const socket = io(); // 서버와 소켓 연결!
+    const socket = io();
 
     const form = document.getElementById('form');
     const input = document.getElementById('input');
     const messages = document.getElementById('messages');
 
     form.addEventListener('submit', (e) => {
-      e.preventDefault(); // 새로고침 막기
-      if (input.value) {
-        socket.emit('chat message', input.value); // 서버로 메시지 보내기
+      e.preventDefault();
+      if (input.value.trim() !== '') {
+        socket.emit('chat message', input.value);
         input.value = '';
       }
     });
