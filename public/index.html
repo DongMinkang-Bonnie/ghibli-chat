@@ -1,39 +1,96 @@
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  const socket = io();
-  const form = document.getElementById('chatForm');
-  const input = document.getElementById('messageInput');
-  const messages = document.getElementById('messages');
-
-  // 새로고침해도 채팅기록 남기기
-  function saveMessages() {
-    localStorage.setItem('chatMessages', messages.innerHTML);
-  }
-
-  function loadMessages() {
-    const saved = localStorage.getItem('chatMessages');
-    if (saved) {
-      messages.innerHTML = saved;
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>놀러와요 동무의 숲</title>
+  <style>
+    body {
+      background-color: #dff5f5;
+      text-align: center;
+      font-family: "Noto Sans", "Arial", sans-serif;
     }
-  }
-
-  loadMessages(); // 페이지 열리면 저장된 메시지 불러오기
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (input.value) {
-      socket.emit('chat message', input.value);
-      input.value = '';
+    #messages {
+      list-style: none;
+      padding: 0;
+      max-width: 400px;
+      margin: 20px auto;
+      text-align: left;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      max-height: 300px;
     }
-  });
+    #messages li {
+      margin-bottom: 10px;
+      word-wrap: break-word;
+    }
+    #chatForm {
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 200px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: none;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>놀러와요 동무의 숲에 오신 걸 환영합니다!</h1>
 
-  socket.on('chat message', function(msg) {
-    const item = document.createElement('li');
-    item.textContent = msg;
-    messages.appendChild(item);
-    saveMessages(); // 채팅 받을 때마다 저장
+  <ul id="messages"></ul>
 
-    // 🔥 새 메시지가 추가될 때마다 자동 스크롤 맨 아래로 이동!
-    messages.scrollTop = messages.scrollHeight;
-  });
-</script>
+  <form id="chatForm">
+    <input id="messageInput" autocomplete="off" placeholder="메시지를 입력하세요" />
+    <button>보내기</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('messageInput');
+    const messages = document.getElementById('messages');
+
+    function saveMessages() {
+      localStorage.setItem('chatMessages', messages.innerHTML);
+    }
+
+    function loadMessages() {
+      const saved = localStorage.getItem('chatMessages');
+      if (saved) {
+        messages.innerHTML = saved;
+      }
+    }
+
+    loadMessages();
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (input.value) {
+        socket.emit('chat message', input.value);
+        input.value = '';
+      }
+    });
+
+    socket.on('chat message', function(msg) {
+      const item = document.createElement('li');
+      item.textContent = msg;
+      messages.appendChild(item);
+      saveMessages();
+      // 자동 스크롤
+      messages.scrollTop = messages.scrollHeight;
+    });
+  </script>
+</body>
+</html>
