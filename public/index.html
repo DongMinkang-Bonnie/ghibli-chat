@@ -2,117 +2,92 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>지브리 채팅방</title>
-  <script src="/socket.io/socket.io.js"></script>
+  <title>놀러와요 동무의 숲</title>
   <style>
     body {
-      background-color: #e0f7fa;
-      font-family: 'Arial', 'Apple SD Gothic Neo', 'Pretendard', sans-serif;
+      background-color: #dff5f5;
       text-align: center;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
+      font-family: "Noto Sans", "Arial", sans-serif;
     }
-
-    h1 {
-      margin-top: 50px;
-      font-size: 2rem;
-      font-weight: bold;
-    }
-
-    ul#messages {
-      list-style-type: none;
+    #messages {
+      list-style: none;
       padding: 0;
-      width: 100%;
-      max-width: 500px;
-      margin: 20px auto 0;
+      max-width: 400px;
+      margin: 20px auto;
       text-align: left;
-    }
-
-    ul#messages li {
       background: #ffffff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      max-height: 300px;
+    }
+    #messages li {
       margin-bottom: 10px;
-      padding: 10px 15px;
-      border-radius: 15px;
-      font-size: 1.1rem;
-      word-break: break-word;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      word-wrap: break-word;
     }
-
-    form {
-      margin-top: auto;
-      margin-bottom: 50px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
+    #chatForm {
+      margin-top: 20px;
     }
-
-    input#input {
-      padding: 12px 20px;
-      border: 2px solid #00acc1;
+    input[type="text"] {
+      padding: 10px;
+      width: 200px;
       border-radius: 20px;
-      outline: none;
-      font-size: 1rem;
-      width: 250px;
-      transition: 0.2s;
+      border: 1px solid #ccc;
     }
-
-    input#input:focus {
-      border-color: #007c91;
-    }
-
     button {
-      padding: 12px 20px;
-      background-color: #00acc1;
-      border: none;
+      padding: 10px 20px;
       border-radius: 20px;
+      border: none;
+      background-color: #4caf50;
       color: white;
-      font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    button:hover {
-      background-color: #007c91;
     }
   </style>
 </head>
 <body>
-
-  <h1>지브리 채팅방에 오신 걸 환영합니다!</h1>
-
+  <h1>놀러와요 동무의 숲에 오신 걸 환영합니다!</h1>
   <ul id="messages"></ul>
-
-  <form id="form" action="javascript:void(0);">
-    <input id="input" autocomplete="off" placeholder="메시지를 입력하세요" />
+  <form id="chatForm">
+    <input id="messageInput" autocomplete="off" placeholder="메시지를 입력하세요" />
     <button>보내기</button>
   </form>
 
+  <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-
-    const form = document.getElementById('form');
-    const input = document.getElementById('input');
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('messageInput');
     const messages = document.getElementById('messages');
 
-    form.addEventListener('submit', (e) => {
+    // 새로고침해도 채팅기록 남기기
+    function saveMessages() {
+      localStorage.setItem('chatMessages', messages.innerHTML);
+    }
+
+    function loadMessages() {
+      const saved = localStorage.getItem('chatMessages');
+      if (saved) {
+        messages.innerHTML = saved;
+      }
+    }
+
+    loadMessages(); // 페이지 열리면 저장된 메시지 불러오기
+
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
-      if (input.value.trim() !== '') {
+      if (input.value) {
         socket.emit('chat message', input.value);
         input.value = '';
       }
     });
 
-    socket.on('chat message', (msg) => {
+    socket.on('chat message', function(msg) {
       const item = document.createElement('li');
       item.textContent = msg;
       messages.appendChild(item);
-      window.scrollTo(0, document.body.scrollHeight);
+      saveMessages(); // 채팅 받을 때마다 저장
     });
   </script>
-
 </body>
 </html>
