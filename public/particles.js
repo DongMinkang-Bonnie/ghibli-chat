@@ -1,48 +1,40 @@
-// 간단한 particle 애니메이션 예제 (지브리 감성을 위한)
-// 실제 완성도 높은 애니메이션은 Particle.js 라이브러리 등 추가 사용 필요
+// 아주 간단한 파티클 이펙트
 
-function clearParticles() {
-  document.querySelectorAll('.particle').forEach(p => p.remove());
+// 비
+function createRain() {
+  const rain = document.createElement('div');
+  rain.className = 'rain-drop';
+  rain.style.left = Math.random() * 100 + 'vw';
+  rain.style.animationDuration = 0.5 + Math.random() * 0.5 + 's';
+  document.body.appendChild(rain);
+
+  setTimeout(() => {
+    rain.remove();
+  }, 1000);
 }
 
-function createParticle(symbol, x, y, duration) {
-  const p = document.createElement('div');
-  p.className = 'particle';
-  p.innerText = symbol;
-  p.style.left = `${x}px`;
-  p.style.top = `${y}px`;
-  p.style.animationDuration = `${duration}s`;
-  document.body.appendChild(p);
+// 눈
+function createSnow() {
+  const snow = document.createElement('div');
+  snow.className = 'snow-flake';
+  snow.style.left = Math.random() * 100 + 'vw';
+  snow.style.animationDuration = 2 + Math.random() * 3 + 's';
+  document.body.appendChild(snow);
+
+  setTimeout(() => {
+    snow.remove();
+  }, 5000);
 }
 
-function particlesRain() {
-  clearParticles();
-  for (let i = 0; i < 50; i++) {
-    createParticle('💧', Math.random() * window.innerWidth, Math.random() * window.innerHeight, 3 + Math.random() * 2);
+// 주기적으로 이펙트 생성
+setInterval(() => {
+  const theme = document.body.dataset.theme;
+  if (theme === 'rain') {
+    createRain();
+  } else if (theme === 'snow') {
+    createSnow();
   }
-}
+}, 200);
 
-function particlesSnow() {
-  clearParticles();
-  for (let i = 0; i < 50; i++) {
-    createParticle('❄️', Math.random() * window.innerWidth, Math.random() * window.innerHeight, 5 + Math.random() * 3);
-  }
-}
+// CSS는 style.css에서 함께 관리 (rain-drop, snow-flake)
 
-// CSS for particles (inject style dynamically)
-const style = document.createElement('style');
-style.innerHTML = `
-.particle {
-  position: fixed;
-  font-size: 24px;
-  pointer-events: none;
-  animation-name: fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-@keyframes fall {
-  0% { transform: translateY(0px); opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-`;
-document.head.appendChild(style);
