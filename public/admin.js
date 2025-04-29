@@ -1,131 +1,107 @@
-const ADMIN_PASSWORD = "75271356"; // 관리자 비밀번호
-
+// ─────────────────────────────────────────────────────────
+// 관리자 비밀번호 설정
+const ADMIN_PASSWORD = "75271356";
 let isAdmin = false;
-let autoBackgroundInterval = null;
+let autoThemeInterval = null;
 
-// 관리자 로그인
-function openAdminLogin() {
-  document.getElementById('admin-login').style.display = 'block';
+// ─────────────────────────────────────────────────────────
+// 개발자 모드 진입/해제
+function openAdmin() {
+  document.getElementById('admin-login-popup').classList.remove('hidden');
 }
 
 function verifyAdmin() {
-  const password = document.getElementById('admin-password').value;
-  if (password === ADMIN_PASSWORD) {
+  const input = document.getElementById('admin-password-input');
+  const pwd = input.value;
+  input.value = '';
+  if (pwd === ADMIN_PASSWORD) {
     isAdmin = !isAdmin;
-    document.getElementById('admin-login').style.display = 'none';
-    document.getElementById('admin-panel').style.display = isAdmin ? 'block' : 'none';
-    document.getElementById('theme-buttons').style.display = isAdmin ? 'block' : 'none';
+    // 팝업 숨기기
+    document.getElementById('admin-login-popup').classList.add('hidden');
+    // 관리자 패널/테마 컨트롤 토글
+    document.getElementById('admin-panel').classList.toggle('hidden', !isAdmin);
+    document.getElementById('theme-controls').classList.toggle('hidden', !isAdmin);
     alert(isAdmin ? '개발자 모드 활성화되었습니다.' : '개발자 모드 해제되었습니다.');
   } else {
     alert('비밀번호가 틀렸습니다.');
   }
 }
 
-// 전체 채팅 삭제
-function deleteAllMessages() {
-  if (isAdmin) {
-    socket.emit('admin delete all');
+// ─────────────────────────────────────────────────────────
+// 서버 로그 콘솔 토글
+function toggleConsole() {
+  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
+  document.getElementById('console-log').classList.toggle('hidden');
+}
+
+// ─────────────────────────────────────────────────────────
+// 공지사항 방송
+function broadcastMessage() {
+  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
+  const msg = prompt('공지 메시지를 입력하세요:');
+  if (msg) {
+    socket.emit('admin announce', msg);
   }
 }
 
-// 공지 보내기
-function sendAnnouncement() {
-  if (isAdmin) {
-    const announcement = prompt('보낼 공지 내용을 입력하세요:');
-    if (announcement) {
-      socket.emit('admin announce', announcement);
-    }
-  }
-}
-
-// 방 잠그기/열기
+// ─────────────────────────────────────────────────────────
+// 방 잠금/해제 (스텁)
 function lockRoom() {
-  alert('(준비중) 방 잠금/해제 기능은 차후 업데이트될 예정입니다.');
+  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
+  // 실제 방잠금 로직은 서버 측 구현 필요
+  alert('방 잠금/해제 기능은 곧 제공됩니다.');
 }
 
-// 배경 업로드
-function uploadBackground() {
-  if (isAdmin) {
-    const url = prompt('배경 이미지 URL을 입력하세요:');
-    if (url) {
-      document.body.style.backgroundImage = `url('${url}')`;
-      document.body.style.backgroundSize = 'cover';
-    }
-  }
-}
-
-// 테마 수동 변경
-function toggleTheme(theme) {
-  if (isAdmin) {
-    socket.emit('admin background change', theme);
-  }
-}
-
-// 비/눈 토글 효과
-function toggleEffect(effect) {
-  if (isAdmin) {
-    const currentTheme = document.body.dataset.theme;
-    if (currentTheme === effect) {
-      document.body.dataset.theme = '';
-      socket.emit('admin background change', '');
-    } else {
-      document.body.dataset.theme = effect;
-      socket.emit('admin background change', effect);
-    }
-  }
-}
-
-// 시간대 변경 (아침/낮/저녁/밤)
-function changeTime(time) {
-  if (isAdmin) {
-    socket.emit('admin background change', time);
-  }
-}
-
-// 배경 자동 전환 토글
-function toggleAutoBackground() {
-  if (!isAdmin) return;
-
-  if (autoBackgroundInterval) {
-    clearInterval(autoBackgroundInterval);
-    autoBackgroundInterval = null;
+// ─────────────────────────────────────────────────────────
+// 자동 테마 전환 토글
+function toggleAutoTheme() {
+  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
+  if (autoThemeInterval) {
+    clearInterval(autoThemeInterval);
+    autoThemeInterval = null;
     alert('자동 배경 전환이 중지되었습니다.');
   } else {
-    const sec = parseInt(document.getElementById('background-interval').value);
-    if (isNaN(sec) || sec <= 0) {
-      alert('전환 주기(초)를 입력하세요.');
-      return;
-    }
-    autoBackgroundInterval = setInterval(() => {
-      const themes = ['spring', 'summer', 'autumn', 'winter', 'rain', 'snow', 'morning', 'day', 'evening', 'night'];
-      const randomTheme = themes[Math.floor(Math.random() * themes.length)];
-      toggleTheme(randomTheme);
-    }, sec * 1000);
+    // 5분 주기 기본
+    autoThemeInterval = setInterval(() => {
+      const themes = ['spring','summer','autumn','winter','rain','snow','morning','day','evening','night'];
+      const rnd = themes[Math.floor(Math.random() * themes.length)];
+      toggleTheme(rnd);
+    }, 5 * 60 * 1000);
     alert('자동 배경 전환이 시작되었습니다.');
   }
 }
 
-// 접속자 목록 토글
-function toggleUserList() {
-  const list = document.getElementById('online-users');
-  list.style.display = list.style.display === 'none' ? 'block' : 'none';
+// ─────────────────────────────────────────────────────────
+// 커스텀 배경 업로드
+function uploadCustomBg() {
+  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
+  const inp = document.getElementById('custom-bg');
+  if (inp.files && inp.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.body.style.backgroundImage = `url('${e.target.result}')`;
+      document.body.style.backgroundSize = 'cover';
+    };
+    reader.readAsDataURL(inp.files[0]);
+  }
 }
 
-// 접속자 목록 고정
-function pinUserList() {
-  const list = document.getElementById('online-users');
-  list.style.position = 'fixed';
-  list.style.top = '10px';
-  list.style.right = '10px';
+// ─────────────────────────────────────────────────────────
+// 테마 수동 변경
+function toggleTheme(theme) {
+  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
+  socket.emit('admin background change', theme);
+  document.body.dataset.theme = theme;
 }
 
-// 다크모드
+// ─────────────────────────────────────────────────────────
+// 다크모드 토글
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
 }
 
-// 하단 탭바
-function showTab(tabName) {
-  // 나중에 세부 탭별 기능 추가 가능
-  alert(tabName + ' 탭 선택됨');
+// ─────────────────────────────────────────────────────────
+// 접속자 목록 토글
+function toggleOnlineUsers() {
+  document.getElementById('online-users').classList.toggle('hidden');
 }

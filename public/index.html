@@ -1,298 +1,151 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>놀러와요 동무의 숲 - 지브리 고급 에디션</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>놀러와요 동무의 숲</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="/socket.io/socket.io.js"></script>
   <script src="particles.js" defer></script>
   <script src="socket.js" defer></script>
   <script src="admin.js" defer></script>
 </head>
 <body>
-  <!-- 개발자 콘솔 (실시간 로그, 좌측 상단 고정) -->
-  <div id="dev-console">
-    <h4>개발자 콘솔</h4>
-    <div id="console-log"></div>
+
+  <!-- 🔐 개발자 로그인 -->
+  <div id="admin-login-popup" class="popup hidden">
+    <h3>개발자 비밀번호</h3>
+    <input id="admin-password-input" type="password" placeholder="비밀번호 입력" />
+    <button onclick="verifyAdmin()">확인</button>
   </div>
 
-  <!-- 로그인/회원가입 화면 -->
+  <!-- 👤 인증 섹션 -->
   <div id="auth-section">
     <h1>🌳 놀러와요 동무의 숲 🌳</h1>
-    <div id="signup">
+
+    <div class="auth-block">
       <h2>회원가입</h2>
-      <input id="signup-id" placeholder="아이디"><br>
-      <input id="signup-password" type="password" placeholder="비밀번호"><br>
-      <input id="signup-nickname" placeholder="닉네임"><br>
+      <input id="signup-id" placeholder="아이디" />
+      <input id="signup-password" type="password" placeholder="비밀번호" />
+      <input id="signup-nickname" placeholder="닉네임" />
       <button onclick="signup()">회원가입</button>
     </div>
 
-    <div id="login">
+    <div class="auth-block">
       <h2>로그인</h2>
-      <input id="login-id" placeholder="아이디"><br>
-      <input id="login-password" type="password" placeholder="비밀번호"><br>
+      <input id="login-id" placeholder="아이디" />
+      <input id="login-password" type="password" placeholder="비밀번호" />
       <button onclick="login()">로그인</button>
     </div>
 
-    <div id="recover">
-      <h3>비밀번호 찾기</h3>
-      <input id="recover-id" placeholder="아이디 입력"><br>
+    <div class="auth-block">
+      <h2>비밀번호 찾기</h2>
+      <input id="recover-id" placeholder="아이디 입력" />
       <button onclick="recoverPassword()">비밀번호 찾기</button>
     </div>
 
-    <div id="change-password">
-      <h3>비밀번호 변경</h3>
-      <input id="change-id" placeholder="아이디 입력"><br>
-      <input id="change-old-password" type="password" placeholder="기존 비밀번호 입력"><br>
-      <input id="change-new-password" type="password" placeholder="새 비밀번호 입력"><br>
+    <div class="auth-block">
+      <h2>비밀번호 변경</h2>
+      <input id="pwchange-id" placeholder="아이디 입력" />
+      <input id="pwchange-old" type="password" placeholder="기존 비밀번호 입력" />
+      <input id="pwchange-new" type="password" placeholder="새 비밀번호 입력" />
       <button onclick="changePassword()">비밀번호 변경</button>
     </div>
   </div>
 
-  <!-- 채팅방 및 커뮤니티 화면 -->
-  <div id="chat-section" style="display:none;">
-    <div id="profile-bar">
+  <!-- ✅ 메인 섹션 -->
+  <div id="main-section" class="hidden">
+    <!-- 상단 사용자 바 -->
+    <div id="top-bar">
       <span id="user-info"></span>
-      <button onclick="openProfileSettings()">프로필 설정</button>
+      <button onclick="openProfile()">프로필 설정</button>
       <button onclick="deleteAccount()">계정 삭제</button>
       <button onclick="logout()">로그아웃</button>
     </div>
-    
-    <div id="room-section">
-      <h2 id="welcome-text"></h2>
-      <div id="room-controls">
-        <button onclick="createRoom()">방 만들기</button>
-        <button onclick="showRoomList()">방 목록 보기</button>
-        <!-- 정렬 버튼 -->
-        <button onclick="sortRooms('latest')">최신순</button>
-        <button onclick="sortRooms('empty')">빈 방 순</button>
+
+    <!-- 탭 바 -->
+    <div id="tabs">
+      <button onclick="switchTab('friends')">👥 친구</button>
+      <button onclick="switchTab('rooms')">💬 채팅방</button>
+      <button onclick="switchTab('profile')">🙍‍♂️ 프로필</button>
+    </div>
+
+    <!-- 친구 탭 -->
+    <div id="tab-friends" class="tab hidden">
+      <h2>친구 목록</h2>
+      <div id="friend-list"></div>
+    </div>
+
+    <!-- 채팅방 탭 -->
+    <div id="tab-rooms" class="tab hidden">
+      <h2>방 목록</h2>
+      <button onclick="createRoom()">➕ 방 만들기</button>
+      <div class="sort-buttons">
+        <button onclick="sortRooms('recent')">🕒 최신순</button>
+        <button onclick="sortRooms('empty')">📭 빈 방순</button>
       </div>
-      <div id="room-list" style="display:none;"></div>
+      <div id="room-list"></div>
     </div>
 
-    <div id="friend-section">
-      <h3>친구 목록</h3>
-      <button onclick="showFriendList()">친구 목록 보기</button>
-      <div id="friend-list" style="display:none;"></div>
+    <!-- 프로필 탭 -->
+    <div id="tab-profile" class="tab hidden">
+      <h2>내 프로필</h2>
+      <div id="profile-area">
+        <img id="profile-preview" src="" alt="프로필 사진" />
+        <input type="file" id="profile-upload" onchange="uploadProfile()" />
+        <input id="nickname-change" placeholder="닉네임 변경" />
+        <button onclick="saveProfile()">저장</button>
+      </div>
     </div>
 
-    <!-- 채팅 영역 -->
-    <div id="chat-container">
-      <ul id="messages"></ul>
+    <!-- 실제 채팅 영역 -->
+    <div id="chat-box" class="hidden">
+      <div id="chat-header">
+        <span id="chat-room-name"></span>
+        <button onclick="leaveRoom()">🚪 나가기</button>
+      </div>
+      <ul id="chat-messages"></ul>
       <form id="chat-form">
         <input id="messageInput" autocomplete="off" placeholder="메시지를 입력하세요" />
         <button type="submit">보내기</button>
       </form>
     </div>
 
-    <!-- 관리자 모드 버튼 -->
-    <button id="admin-button" onclick="openAdminLogin()">🔒</button>
-
-    <!-- 테마 변경 버튼 -->
-    <div id="theme-buttons">
-      <button onclick="changeTheme('spring')">🌸 봄</button>
-      <button onclick="changeTheme('summer')">☀️ 여름</button>
-      <button onclick="changeTheme('autumn')">🍁 가을</button>
-      <button onclick="changeTheme('winter')">❄️ 겨울</button>
-      <button onclick="changeTheme('rain')">☔ 비</button>
-      <button onclick="changeTheme('snow')">🌨️ 눈</button>
-      <button onclick="changeTime('morning')">🌅 아침</button>
-      <button onclick="changeTime('day')">🌞 낮</button>
-      <button onclick="changeTime('evening')">🌇 저녁</button>
-      <button onclick="changeTime('night')">🌙 밤</button>
+    <!-- 🎛️ 개발자 패널 -->
+    <div id="admin-panel" class="hidden">
+      <h3>관리자 도구</h3>
+      <button onclick="toggleConsole()">📟 서버 로그 보기</button>
+      <button onclick="broadcastMessage()">📢 공지 보내기</button>
+      <button onclick="lockRoom()">🔒 방 잠금/해제</button>
+      <button onclick="toggleAutoTheme()">🖼️ 자동 배경전환</button>
+      <input type="file" id="custom-bg" onchange="uploadCustomBg()" />
     </div>
 
-    <!-- 다크모드 토글 -->
-    <button id="darkmode-toggle" onclick="toggleDarkMode()">🌑 다크모드</button>
-
-    <!-- 접속자 보기 버튼 -->
-    <button id="show-users-button" onclick="toggleUserList()">👥 접속자 보기</button>
-    <div id="online-users" style="display:none;">
-      <button onclick="pinUserList()">📌 고정하기</button>
-      <div id="user-list-content"></div>
+    <!-- 🖼️ 배경 테마 컨트롤(개발자 모드만) -->
+    <div id="theme-controls" class="hidden">
+      <button onclick="toggleTheme('spring')">🌸 봄</button>
+      <button onclick="toggleTheme('summer')">☀️ 여름</button>
+      <button onclick="toggleTheme('autumn')">🍁 가을</button>
+      <button onclick="toggleTheme('winter')">❄️ 겨울</button>
+      <button onclick="toggleTheme('rain')">☔ 비</button>
+      <button onclick="toggleTheme('snow')">🌨️ 눈</button>
+      <button onclick="toggleTheme('morning')">🌅 아침</button>
+      <button onclick="toggleTheme('day')">🌞 낮</button>
+      <button onclick="toggleTheme('evening')">🌇 저녁</button>
+      <button onclick="toggleTheme('night')">🌙 밤</button>
     </div>
 
-    <!-- 관리자 패널 -->
-    <div id="admin-panel" style="display:none;">
-      <h3>관리자 패널</h3>
-      <button onclick="deleteAllMessages()">전체 대화 삭제</button>
-      <button onclick="sendAnnouncement()">공지 보내기</button>
-      <button onclick="lockRoom()">방 잠금/해제</button>
-      <!-- (추후) 강퇴/벤 기능 버튼 포함 -->
-      <button onclick="kickUser()">강퇴</button>
-      <button onclick="banUser()">벤</button>
+    <!-- 하단 버튼 -->
+    <div id="bottom-buttons">
+      <button onclick="toggleDarkMode()">🌑 다크모드</button>
+      <button onclick="toggleOnlineUsers()">👥 접속자 보기</button>
+      <button onclick="openAdmin()">🔒 개발자모드</button>
     </div>
+
+    <!-- 접속자 목록 -->
+    <div id="online-users" class="hidden"></div>
+    <!-- 서버 콘솔 로그 -->
+    <div id="console-log" class="hidden"></div>
   </div>
 
-  <!-- 관리자 로그인 창 -->
-  <div id="admin-login" style="display:none;">
-    <h3>관리자 로그인</h3>
-    <input id="admin-password" type="password" placeholder="비밀번호 입력">
-    <button onclick="verifyAdmin()">확인</button>
-  </div>
-
-  <!-- 프로필 설정 팝업 -->
-  <div id="profile-settings" style="display:none;">
-    <h3>프로필 설정</h3>
-    <input id="profile-nickname" placeholder="닉네임"><br>
-    <input id="profile-status" placeholder="상태 메시지"><br>
-    <input id="profile-image" placeholder="프로필 이미지 URL (선택)"><br>
-    <button onclick="updateProfile()">프로필 업데이트</button>
-    <button onclick="closeProfileSettings()">닫기</button>
-  </div>
-
-  <!-- 기본 스크립트 로직 (하단에 추가된 모든 함수 포함) -->
-  <script>
-  // 회원가입, 로그인, 비밀번호 찾기, 비밀번호 변경 관련 함수들은 이전과 동일
-  function signup() {
-    const id = document.getElementById('signup-id').value;
-    const password = document.getElementById('signup-password').value;
-    const nickname = document.getElementById('signup-nickname').value;
-    fetch('/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, password, nickname })
-    })
-    .then(res => res.text())
-    .then(msg => { alert(msg); })
-    .catch(err => { alert('회원가입 실패: ' + err.message); });
-  }
-
-  function login() {
-    const id = document.getElementById('login-id').value;
-    const password = document.getElementById('login-password').value;
-    fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, password })
-    })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('auth-section').style.display = 'none';
-      document.getElementById('chat-section').style.display = 'block';
-      document.getElementById('welcome-text').innerText = `${data.nickname}님 환영합니다!`;
-      document.getElementById('user-info').innerText = `아이디: ${document.getElementById('login-id').value} / 닉네임: ${data.nickname}`;
-      connectUser(data.nickname, document.getElementById('login-id').value);
-    })
-    .catch(err => { alert('로그인 실패: ' + err.message); });
-  }
-
-  function recoverPassword() {
-    const id = document.getElementById('recover-id').value;
-    fetch('/recover', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
-    })
-    .then(res => res.json())
-    .then(data => { alert(`임시 비밀번호: ${data.tempPassword}`); })
-    .catch(err => { alert('비밀번호 찾기 실패: ' + err.message); });
-  }
-
-  function changePassword() {
-    const id = document.getElementById('change-id').value;
-    const oldPassword = document.getElementById('change-old-password').value;
-    const newPassword = document.getElementById('change-new-password').value;
-    fetch('/change-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, oldPassword, newPassword })
-    })
-    .then(res => res.text())
-    .then(msg => { alert(msg); })
-    .catch(err => { alert('비밀번호 변경 실패: ' + err.message); });
-  }
-
-  // 프로필 설정
-  function openProfileSettings() {
-    document.getElementById('profile-settings').style.display = 'block';
-  }
-  function closeProfileSettings() {
-    document.getElementById('profile-settings').style.display = 'none';
-  }
-  function updateProfile() {
-    const nickname = document.getElementById('profile-nickname').value;
-    const status = document.getElementById('profile-status').value;
-    const image = document.getElementById('profile-image').value;
-    // 이 값들을 서버에 저장하는 로직을 추가해야 함 (스텁)
-    alert('프로필이 업데이트되었습니다!');
-    closeProfileSettings();
-  }
-
-  // 계정 삭제
-  function deleteAccount() {
-    if (confirm('정말 계정을 삭제하시겠습니까?')) {
-      const id = document.getElementById('login-id').value;
-      const password = prompt('계정 삭제를 위해 비밀번호를 입력하세요:');
-      fetch('/delete-account', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, password })
-      })
-      .then(res => res.text())
-      .then(msg => { alert(msg); location.reload(); })
-      .catch(err => { alert('계정 삭제 실패: ' + err.message); });
-    }
-  }
-
-  // 로그아웃
-  function logout() {
-    location.reload();
-  }
-
-  // 관리자 모드
-  function openAdminLogin() {
-    document.getElementById('admin-login').style.display = 'block';
-  }
-  function verifyAdmin() {
-    const password = document.getElementById('admin-password').value;
-    if (password === '75271356') {
-      document.getElementById('admin-login').style.display = 'none';
-      document.getElementById('admin-panel').style.display = 'block';
-      alert('관리자 모드 진입 성공!');
-    } else {
-      alert('비밀번호가 틀렸습니다.');
-    }
-  }
-
-  // 실시간 접속자 관리 (팝업)
-  function toggleUserList() {
-    const list = document.getElementById('online-users');
-    list.style.display = list.style.display === 'none' ? 'block' : 'none';
-  }
-  function pinUserList() {
-    const list = document.getElementById('online-users');
-    list.style.position = 'fixed';
-    list.style.top = '10px';
-    list.style.right = '10px';
-  }
-
-  // 다크모드 토글
-  function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-  }
-
-  // 테마, 시간 변경 – 여기서는 socket 명령 보내기 (실제로 particles.js에서 애니메이션 처리)
-  function changeTheme(season) {
-    socket.emit('admin background change', season);
-  }
-  function changeTime(time) {
-    socket.emit('admin background change', time);
-  }
-
-  // 연결된 유저 정보 전송 (로그인 후)
-  function connectUser(nickname, id) {
-    socket.emit('user connected', { nickname, id });
-  }
-
-  // 개발자용 콘솔 로그 전송 (스텁)
-  function logEvent(log) {
-    socket.emit('log event', log);
-    const consoleLog = document.getElementById('console-log');
-    const entry = document.createElement('div');
-    entry.innerText = log;
-    consoleLog.appendChild(entry);
-  }
-  </script>
 </body>
 </html>

@@ -76,7 +76,14 @@ app.post('/delete-account', (req, res) => {
 app.post('/create-room', (req, res) => {
   const { roomId, name, isSecret, password, maxUsers } = req.body;
   if (rooms[roomId]) return res.status(400).send('이미 존재하는 방입니다.');
-  rooms[roomId] = { name, isSecret, password: isSecret ? password : null, members: [], createdAt: Date.now(), maxUsers: maxUsers || 8 };
+  rooms[roomId] = {
+    name,
+    isSecret,
+    password: isSecret ? password : null,
+    members: [],
+    createdAt: Date.now(),
+    maxUsers: maxUsers || 8
+  };
   res.send('방 생성 완료');
 });
 
@@ -91,7 +98,7 @@ app.post('/join-room', (req, res) => {
   res.send('방 입장 성공');
 });
 
-// socket.io
+// Socket.IO
 io.on('connection', (socket) => {
   console.log('새 연결:', socket.id);
 
@@ -101,7 +108,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', (data) => {
-    io.emit('chat message', data); // { from, text, time, profileImage }
+    io.emit('chat message', data); // { roomId, from, id, text, time, profileImage }
   });
 
   socket.on('admin delete all', () => {
@@ -123,10 +130,6 @@ io.on('connection', (socket) => {
   socket.on('admin ban', (userId) => {
     bannedUsers.add(userId);
     io.emit('admin update ban', userId);
-  });
-
-  socket.on('log event', (log) => {
-    console.log('로그 이벤트:', log);
   });
 
   socket.on('disconnect', () => {
