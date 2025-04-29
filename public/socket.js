@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const socket = io();
+  // 글로벌 socket 객체 만들기
+  window.socket = io();
+  const socket = window.socket;
 
   // 탭 전환 함수
   window.switchTab = function(tab) {
@@ -13,13 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
   window.login = function() {
     const id = document.getElementById('login-id').value.trim();
     const password = document.getElementById('login-password').value.trim();
+
     fetch('/login', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, password })
     })
-    .then(res => res.json())
+    .then(async res => {
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    })
     .then(data => {
+      localStorage.setItem('nickname', data.nickname); // 닉네임 저장
       document.getElementById('auth-section').classList.add('hidden');
       document.getElementById('main-section').classList.remove('hidden');
       switchTab('rooms');
@@ -33,12 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const id = document.getElementById('signup-id').value.trim();
     const password = document.getElementById('signup-password').value.trim();
     const nickname = document.getElementById('signup-nickname').value.trim();
+
     fetch('/signup', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, password, nickname })
     })
-    .then(res => res.text())
+    .then(async res => {
+      if (!res.ok) throw new Error(await res.text());
+      return res.text();
+    })
     .then(msg => {
       alert(msg);
       backToLogin();
@@ -49,12 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // 비밀번호 찾기
   window.recoverPassword = function() {
     const id = document.getElementById('recover-id').value.trim();
+
     fetch('/recover', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
     })
-    .then(res => res.json())
+    .then(async res => {
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    })
     .then(data => {
       alert(`임시 비밀번호: ${data.tempPassword}`);
       backToLogin();
@@ -67,12 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const id = document.getElementById('changepw-id').value.trim();
     const oldPw = document.getElementById('changepw-old').value.trim();
     const newPw = document.getElementById('changepw-new').value.trim();
+
     fetch('/change-password', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, oldPassword: oldPw, newPassword: newPw })
     })
-    .then(res => res.text())
+    .then(async res => {
+      if (!res.ok) throw new Error(await res.text());
+      return res.text();
+    })
     .then(msg => {
       alert(msg);
       backToLogin();
@@ -112,14 +131,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const text = input.value.trim();
     if (!text) return;
     const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-    socket.emit('chat message', { text, time });
+
+    socket.emit('chat message', {
+      text,
+      time,
+      nickname: localStorage.getItem('nickname') || '익명'
+    });
+
     input.value = '';
   });
 
   // 채팅 수신
   socket.on('chat message', data => {
     const li = document.createElement('li');
-    li.textContent = `${data.text}   (${data.time})`;
+    li.textContent = `${data.nickname || '익명'}: ${data.text}   (${data.time})`;
     messages.appendChild(li);
     messages.scrollTop = messages.scrollHeight;
   });
@@ -127,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 접속자 리스트 업데이트
   socket.on('update users', users => {
     const list = document.getElementById('online-users');
+    if (!list) return;
     list.innerHTML = '<h4>접속자 목록</h4>' + users.map(u => `<div>${u.nickname}</div>`).join('');
   });
 
