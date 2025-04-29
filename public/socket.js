@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   const socket = io();
-  
-  // 탭 전환
-  document.querySelectorAll('#top-nav button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.dataset.sec;
-      document.querySelectorAll('.tab-section')
-        .forEach(sec => sec.classList.remove('active'));
-      document.getElementById(target).classList.add('active');
-    });
-  });
+
+  // 탭 전환 함수
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.tab').forEach(sec => sec.classList.add('hidden'));
+    document.getElementById(tab).classList.remove('hidden');
+    document.getElementById('current-tab').innerText =
+      tab === 'friends' ? '친구' : tab === 'rooms' ? '채팅방' : '프로필';
+  };
 
   // 로그인
   window.login = function() {
@@ -22,10 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(res => res.json())
     .then(data => {
-      document.getElementById('auth-section').style.display = 'none';
-      document.getElementById('main-section').style.display = 'block';
+      document.getElementById('auth-section').classList.add('hidden');
+      document.getElementById('main-section').classList.remove('hidden');
+      switchTab('rooms');
       socket.emit('user connected', { id, nickname: data.nickname });
-      document.getElementById('user-info').innerText = `${data.nickname}님`;
     })
     .catch(err => alert('로그인 실패: ' + err.message));
   };
@@ -41,7 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify({ id, password, nickname })
     })
     .then(res => res.text())
-    .then(msg => alert(msg))
+    .then(msg => {
+      alert(msg);
+      backToLogin();
+    })
     .catch(err => alert('회원가입 실패: ' + err.message));
   };
 
@@ -54,40 +55,51 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify({ id })
     })
     .then(res => res.json())
-    .then(data => alert(`임시 비밀번호: ${data.tempPassword}`))
+    .then(data => {
+      alert(`임시 비밀번호: ${data.tempPassword}`);
+      backToLogin();
+    })
     .catch(err => alert('비밀번호 찾기 실패: ' + err.message));
   };
 
   // 비밀번호 변경
   window.changePassword = function() {
-    const id = document.getElementById('pwchange-id').value.trim();
-    const oldPassword = document.getElementById('pwchange-old').value.trim();
-    const newPassword = document.getElementById('pwchange-new').value.trim();
+    const id = document.getElementById('changepw-id').value.trim();
+    const oldPw = document.getElementById('changepw-old').value.trim();
+    const newPw = document.getElementById('changepw-new').value.trim();
     fetch('/change-password', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ id, oldPassword, newPassword })
+      body: JSON.stringify({ id, oldPassword: oldPw, newPassword: newPw })
     })
     .then(res => res.text())
-    .then(msg => alert(msg))
+    .then(msg => {
+      alert(msg);
+      backToLogin();
+    })
     .catch(err => alert('비밀번호 변경 실패: ' + err.message));
   };
 
-  // 다크모드 토글
-  window.toggleDarkMode = function() {
-    document.body.classList.toggle('dark-mode');
+  // 로그인 화면 복귀
+  window.backToLogin = function() {
+    document.querySelectorAll('#auth-section > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById('login-box').classList.remove('hidden');
   };
 
-  // 로그아웃
-  window.logout = function() {
-    location.reload();
+  // 회원가입/복구/비번변경 화면 열기
+  window.showSignup = function() {
+    document.querySelectorAll('#auth-section > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById('signup-box').classList.remove('hidden');
   };
 
-  // 하단 탭바 전환
-  window.switchTab = function(tab) {
-    document.querySelectorAll('.tab-section')
-      .forEach(sec => sec.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
+  window.showRecover = function() {
+    document.querySelectorAll('#auth-section > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById('recover-box').classList.remove('hidden');
+  };
+
+  window.showChangePw = function() {
+    document.querySelectorAll('#auth-section > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById('changepw-box').classList.remove('hidden');
   };
 
   // 채팅 전송
@@ -104,18 +116,18 @@ document.addEventListener('DOMContentLoaded', () => {
     input.value = '';
   });
 
+  // 채팅 수신
   socket.on('chat message', data => {
     const li = document.createElement('li');
     li.textContent = `${data.text}   (${data.time})`;
-    li.className = 'my-message'; // 기본 내 메시지 처리
     messages.appendChild(li);
     messages.scrollTop = messages.scrollHeight;
   });
 
-  // 접속자 목록 업데이트
+  // 접속자 리스트 업데이트
   socket.on('update users', users => {
-    const userList = document.getElementById('online-users');
-    userList.innerHTML = '<h4>접속자 목록</h4>' + users.map(u => `<div>${u.nickname}</div>`).join('');
+    const list = document.getElementById('online-users');
+    list.innerHTML = '<h4>접속자 목록</h4>' + users.map(u => `<div>${u.nickname}</div>`).join('');
   });
 
   // 전체 공지 수신
@@ -123,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     alert(`[공지] ${msg}`);
   });
 
-  // 테마 변경 수신
+  // 배경 테마 수신
   socket.on('admin background change', theme => {
     document.body.dataset.theme = theme;
   });

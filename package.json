@@ -1,17 +1,16 @@
 {
-  "name": "mychat",
+  "name": "dongmu-chat",
   "version": "1.0.0",
+  "description": "놀러와요 동무의 숲 - 채팅 프로젝트",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "express": "^5.1.0",
-    "socket.io": "^4.8.1"
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

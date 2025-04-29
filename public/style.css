@@ -3,7 +3,7 @@ body {
   font-family: 'Noto Sans KR', sans-serif;
   margin: 0;
   padding: 0;
-  background: #eef2f3;
+  background: #e8f5e9;
   color: #333;
   overflow-x: hidden;
 }
@@ -16,22 +16,25 @@ h1, h2, h3 {
 
 /* 로그인 화면 */
 #auth-section {
-  padding: 30px;
+  padding: 40px;
   text-align: center;
 }
 
 #auth-section input {
   margin: 8px;
-  padding: 10px;
-  width: 200px;
+  padding: 12px;
+  width: 220px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
 
 #auth-section button {
-  margin: 10px;
+  margin: 8px;
   padding: 10px 20px;
   background: #4caf50;
   color: white;
   border: none;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -42,13 +45,25 @@ h1, h2, h3 {
 /* 메인 화면 */
 #top-nav {
   background: #4caf50;
-  padding: 10px;
-  text-align: center;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-size: 18px;
 }
 
-#top-nav button {
-  margin: 0 8px;
-  padding: 8px 16px;
+#bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #4caf50;
+  display: flex;
+}
+
+#bottom-nav button {
+  flex: 1;
+  padding: 14px 0;
   background: none;
   border: none;
   color: white;
@@ -56,16 +71,12 @@ h1, h2, h3 {
   cursor: pointer;
 }
 
-.tab-section {
-  display: none;
+/* 탭들 */
+.tab {
   padding: 20px;
 }
 
-.tab-section.active {
-  display: block;
-}
-
-/* 채팅방 스타일 */
+/* 채팅 메시지 영역 */
 #chat-messages {
   list-style: none;
   padding: 10px;
@@ -80,9 +91,10 @@ h1, h2, h3 {
 #chat-messages li {
   margin: 8px 0;
   padding: 8px 12px;
-  max-width: 70%;
+  background: #f1f0f0;
   border-radius: 20px;
-  clear: both;
+  max-width: 70%;
+  word-break: break-word;
 }
 
 #chat-messages li.my-message {
@@ -91,13 +103,7 @@ h1, h2, h3 {
   text-align: right;
 }
 
-#chat-messages li.other-message {
-  background: #f1f0f0;
-  margin-right: auto;
-  text-align: left;
-}
-
-/* 채팅 입력 */
+/* 채팅 입력창 */
 #chat-form {
   display: flex;
   margin-top: 10px;
@@ -120,68 +126,26 @@ h1, h2, h3 {
   cursor: pointer;
 }
 
-/* 하단 탭바 */
-#tabs {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #4caf50;
-  display: flex;
-  justify-content: space-around;
+/* 관리자 로그인 팝업 */
+#admin-login-popup {
+  background: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  width: 300px;
+  margin: 100px auto;
+  text-align: center;
+  border-radius: 10px;
 }
 
-#tabs button {
-  flex: 1;
-  padding: 10px;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 16px;
-}
-
-/* 관리자 패널, 콘솔 */
-#admin-panel, #console-log, #online-users {
+#console-log, #online-users {
+  background: white;
   padding: 10px;
   margin: 10px;
-  background: #fff;
   border: 1px solid #ccc;
   border-radius: 10px;
 }
 
-/* 다크모드 */
-body.dark-mode {
-  background: #222;
-  color: #ddd;
-}
-
-body.dark-mode #top-nav,
-body.dark-mode #tabs {
-  background: #333;
-}
-
-body.dark-mode #chat-messages {
-  background: #333;
-  border-color: #555;
-}
-
-body.dark-mode #chat-form input {
-  background: #555;
-  color: white;
-  border: 1px solid #777;
-}
-
-body.dark-mode #chat-form button {
-  background: #666;
-}
-
-body.dark-mode #admin-panel,
-body.dark-mode #console-log,
-body.dark-mode #online-users {
-  background: #333;
-  border-color: #555;
-}
-
-/* 반응형 모바일 최적화 */
+/* 반응형 */
 @media (max-width: 600px) {
   #chat-messages {
     height: 300px;
