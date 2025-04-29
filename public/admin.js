@@ -1,107 +1,81 @@
-// ─────────────────────────────────────────────────────────
-// 관리자 비밀번호 설정
-const ADMIN_PASSWORD = "75271356";
 let isAdmin = false;
-let autoThemeInterval = null;
+let autoThemeTimer = null;
 
-// ─────────────────────────────────────────────────────────
-// 개발자 모드 진입/해제
-function openAdmin() {
-  document.getElementById('admin-login-popup').classList.remove('hidden');
-}
-
-function verifyAdmin() {
-  const input = document.getElementById('admin-password-input');
-  const pwd = input.value;
-  input.value = '';
-  if (pwd === ADMIN_PASSWORD) {
-    isAdmin = !isAdmin;
-    // 팝업 숨기기
+// 관리자 모드 진입
+window.verifyAdmin = function() {
+  const password = document.getElementById('admin-password-input').value;
+  if (password === '75271356') { // 관리자 비밀번호
+    alert('관리자 모드 진입 성공!');
+    isAdmin = true;
     document.getElementById('admin-login-popup').classList.add('hidden');
-    // 관리자 패널/테마 컨트롤 토글
-    document.getElementById('admin-panel').classList.toggle('hidden', !isAdmin);
-    document.getElementById('theme-controls').classList.toggle('hidden', !isAdmin);
-    alert(isAdmin ? '개발자 모드 활성화되었습니다.' : '개발자 모드 해제되었습니다.');
+    document.getElementById('admin-panel').classList.remove('hidden');
   } else {
     alert('비밀번호가 틀렸습니다.');
   }
-}
+};
 
-// ─────────────────────────────────────────────────────────
-// 서버 로그 콘솔 토글
-function toggleConsole() {
-  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
-  document.getElementById('console-log').classList.toggle('hidden');
-}
-
-// ─────────────────────────────────────────────────────────
-// 공지사항 방송
-function broadcastMessage() {
-  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
-  const msg = prompt('공지 메시지를 입력하세요:');
-  if (msg) {
-    socket.emit('admin announce', msg);
+// 전체 공지 보내기
+window.broadcastMessage = function() {
+  const message = prompt('전체 공지할 내용을 입력하세요:');
+  if (message && isAdmin) {
+    socket.emit('admin announce', message);
   }
-}
+};
 
-// ─────────────────────────────────────────────────────────
-// 방 잠금/해제 (스텁)
-function lockRoom() {
-  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
-  // 실제 방잠금 로직은 서버 측 구현 필요
-  alert('방 잠금/해제 기능은 곧 제공됩니다.');
-}
+// 배경 테마 변경
+window.changeTheme = function(theme) {
+  if (isAdmin) {
+    socket.emit('admin background change', theme);
+  }
+};
 
-// ─────────────────────────────────────────────────────────
-// 자동 테마 전환 토글
-function toggleAutoTheme() {
-  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
-  if (autoThemeInterval) {
-    clearInterval(autoThemeInterval);
-    autoThemeInterval = null;
-    alert('자동 배경 전환이 중지되었습니다.');
+// 개발자 콘솔 보기
+window.toggleConsole = function() {
+  const log = document.getElementById('console-log');
+  log.classList.toggle('hidden');
+};
+
+// 콘솔에 로그 남기기
+socket.on('chat message', data => {
+  const log = document.getElementById('console-log');
+  if (!log.classList.contains('hidden')) {
+    const div = document.createElement('div');
+    div.textContent = `[채팅] ${data.text} (${data.time})`;
+    log.appendChild(div);
+  }
+});
+
+// 자동 테마 전환 (랜덤)
+window.toggleAutoTheme = function() {
+  if (autoThemeTimer) {
+    clearInterval(autoThemeTimer);
+    autoThemeTimer = null;
+    alert('자동 테마 전환 중단');
   } else {
-    // 5분 주기 기본
-    autoThemeInterval = setInterval(() => {
-      const themes = ['spring','summer','autumn','winter','rain','snow','morning','day','evening','night'];
-      const rnd = themes[Math.floor(Math.random() * themes.length)];
-      toggleTheme(rnd);
-    }, 5 * 60 * 1000);
-    alert('자동 배경 전환이 시작되었습니다.');
+    autoThemeTimer = setInterval(() => {
+      const themes = ['spring', 'summer', 'autumn', 'winter', 'rain', 'snow', 'morning', 'day', 'evening', 'night'];
+      const random = themes[Math.floor(Math.random() * themes.length)];
+      changeTheme(random);
+    }, 60000); // 1분마다 자동 변경
+    alert('자동 테마 전환 시작');
   }
-}
+};
 
-// ─────────────────────────────────────────────────────────
-// 커스텀 배경 업로드
-function uploadCustomBg() {
-  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
-  const inp = document.getElementById('custom-bg');
-  if (inp.files && inp.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.body.style.backgroundImage = `url('${e.target.result}')`;
-      document.body.style.backgroundSize = 'cover';
-    };
-    reader.readAsDataURL(inp.files[0]);
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-// 테마 수동 변경
-function toggleTheme(theme) {
-  if (!isAdmin) return alert('관리자만 사용 가능합니다.');
-  socket.emit('admin background change', theme);
-  document.body.dataset.theme = theme;
-}
-
-// ─────────────────────────────────────────────────────────
-// 다크모드 토글
-function toggleDarkMode() {
-  document.body.classList.toggle('dark-mode');
-}
-
-// ─────────────────────────────────────────────────────────
-// 접속자 목록 토글
-function toggleOnlineUsers() {
-  document.getElementById('online-users').classList.toggle('hidden');
-}
+// 배경 이미지 업로드
+window.uploadCustomBg = function() {
+  const fileInput = document.getElementById('custom-bg');
+  fileInput.click();
+  fileInput.onchange = function() {
+    const file = fileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.body.style.backgroundImage = `url('${e.target.result}')`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        alert('커스텀 배경 적용 완료');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+};

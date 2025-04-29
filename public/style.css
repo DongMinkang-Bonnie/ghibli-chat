@@ -1,326 +1,189 @@
-/* ────────────────────────────────────────── */
-/* 기본 레이아웃 */
+/* 공통 */
 body {
+  font-family: 'Noto Sans KR', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
-  background: url('/default-background.jpg') no-repeat center center fixed;
-  background-size: cover;
+  background: #eef2f3;
   color: #333;
-  overflow: hidden;
+  overflow-x: hidden;
 }
-
-/* 숨김/표시용 */
 .hidden { display: none; }
 
-/* ────────────────────────────────────────── */
-/* 인증(로그인/회원가입) 섹션 */
-#auth-section {
-  width: 100%;
-  max-width: 400px;
-  margin: 50px auto;
+h1, h2, h3 {
   text-align: center;
-  background: rgba(255,255,255,0.8);
-  padding: 20px;
-  border-radius: 10px;
+  color: #4caf50;
 }
-.auth-block {
-  margin-bottom: 20px;
+
+/* 로그인 화면 */
+#auth-section {
+  padding: 30px;
+  text-align: center;
 }
-.auth-block input {
-  width: 80%;
-  margin: 8px 0;
-  padding: 8px;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+
+#auth-section input {
+  margin: 8px;
+  padding: 10px;
+  width: 200px;
 }
-.auth-block button {
-  padding: 8px 16px;
-  margin-top: 8px;
-  border: none;
+
+#auth-section button {
+  margin: 10px;
+  padding: 10px 20px;
   background: #4caf50;
-  color: #fff;
-  border-radius: 5px;
+  color: white;
+  border: none;
   cursor: pointer;
 }
-.auth-block button:hover {
+
+#auth-section button:hover {
   background: #45a049;
 }
 
-/* ────────────────────────────────────────── */
-/* 메인 섹션 전체 레이아웃 */
-#main-section {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+/* 메인 화면 */
+#top-nav {
+  background: #4caf50;
+  padding: 10px;
+  text-align: center;
 }
 
-/* 상단 사용자 바 */
-#top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255,255,255,0.9);
+#top-nav button {
+  margin: 0 8px;
   padding: 8px 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* 탭 바 */
-#tabs {
-  display: flex;
-  background: rgba(255,255,255,0.9);
-}
-#tabs button {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
   background: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-#tabs button:hover,
-#tabs button.active {
-  background: rgba(0, 150, 136, 0.2);
-}
-
-/* 탭 콘텐츠 */
-.tab {
-  flex: 1;
-  overflow-y: auto;
-  background: rgba(255,255,255,0.8);
-  padding: 16px;
-}
-
-/* 친구 목록 */
-#friend-list div {
-  padding: 8px;
-  margin-bottom: 4px;
-  background: #f0f0f0;
-  border-radius: 5px;
-}
-
-/* 방 목록 */
-.sort-buttons {
-  margin: 8px 0;
-}
-#room-list div {
-  padding: 8px;
-  margin-bottom: 4px;
-  background: #f9f9f9;
-  border-radius: 5px;
-}
-
-/* 프로필 */
-#profile-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-#profile-area img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 8px;
-}
-#profile-area input {
-  margin: 4px 0;
-  padding: 6px;
-  border-radius: 5px;
-  border: 1px solid #aaa;
-}
-#profile-area button {
-  margin-top: 6px;
-  padding: 6px 12px;
   border: none;
-  background: #2196f3;
-  color: #fff;
-  border-radius: 5px;
+  color: white;
+  font-size: 16px;
   cursor: pointer;
 }
 
-/* ────────────────────────────────────────── */
-/* 채팅 박스 */
-#chat-box {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  background: rgba(255,255,255,0.9);
-  margin: 16px;
-  border-radius: 10px;
-  overflow: hidden;
+.tab-section {
+  display: none;
+  padding: 20px;
 }
-#chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #009688;
-  color: #fff;
-  padding: 8px 16px;
+
+.tab-section.active {
+  display: block;
 }
+
+/* 채팅방 스타일 */
 #chat-messages {
-  flex: 1;
   list-style: none;
-  padding: 16px;
+  padding: 10px;
   margin: 0;
+  height: 400px;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
+
 #chat-messages li {
-  display: flex;
-  align-items: flex-end;
-  margin-bottom: 10px;
-  max-width: 70%;
-  word-wrap: break-word;
-}
-#chat-messages li img {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-#chat-messages li .text {
-  background: #e0f2f1;
+  margin: 8px 0;
   padding: 8px 12px;
-  border-radius: 12px;
+  max-width: 70%;
+  border-radius: 20px;
+  clear: both;
 }
+
 #chat-messages li.my-message {
-  align-self: flex-end;
-  flex-direction: row-reverse;
+  background: #dcf8c6;
+  margin-left: auto;
+  text-align: right;
 }
-#chat-messages li.my-message .text {
-  background: #b2dfdb;
+
+#chat-messages li.other-message {
+  background: #f1f0f0;
+  margin-right: auto;
+  text-align: left;
 }
-#chat-messages li.my-message img {
-  margin-left: 8px;
-  margin-right: 0;
-}
+
+/* 채팅 입력 */
 #chat-form {
   display: flex;
-  padding: 8px;
-  background: #f5f5f5;
+  margin-top: 10px;
 }
+
 #chat-form input {
   flex: 1;
   padding: 10px;
-  border-radius: 20px;
   border: 1px solid #ccc;
+  border-radius: 20px;
+  margin-right: 10px;
 }
+
 #chat-form button {
-  padding: 10px 16px;
-  margin-left: 8px;
+  padding: 10px 20px;
+  background: #4caf50;
+  color: white;
   border: none;
-  background: #009688;
-  color: #fff;
   border-radius: 20px;
   cursor: pointer;
 }
 
-/* ────────────────────────────────────────── */
-/* 개발자 패널 */
-#admin-panel {
-  position: absolute;
-  top: 60px;
-  right: 16px;
-  background: rgba(255,255,255,0.95);
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-#admin-panel button,
-#theme-controls button {
-  display: block;
+/* 하단 탭바 */
+#tabs {
+  position: fixed;
+  bottom: 0;
   width: 100%;
-  padding: 6px 0;
-  margin-bottom: 6px;
-  border: none;
-  background: #ff5722;
-  color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
-}
-#admin-panel button:hover,
-#theme-controls button:hover {
-  background: #e64a19;
-}
-
-/* 테마 버튼 */
-#theme-controls {
-  position: absolute;
-  top: 240px;
-  right: 16px;
-  background: rgba(255,255,255,0.95);
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-/* ────────────────────────────────────────── */
-/* 하단 버튼 */
-#bottom-buttons {
+  background: #4caf50;
   display: flex;
   justify-content: space-around;
-  padding: 8px 0;
-  background: rgba(255,255,255,0.9);
 }
-#bottom-buttons button {
+
+#tabs button {
+  flex: 1;
+  padding: 10px;
+  background: none;
   border: none;
-  background: #607d8b;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-#bottom-buttons button:hover {
-  background: #455a64;
+  color: white;
+  font-size: 16px;
 }
 
-/* ────────────────────────────────────────── */
-/* 접속자 목록 & 콘솔 */
-#online-users,
-#console-log {
-  position: absolute;
-  bottom: 60px;
-  right: 16px;
-  width: 200px;
-  max-height: 300px;
-  overflow-y: auto;
-  background: rgba(255,255,255,0.95);
-  padding: 8px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-#online-users.hidden,
-#console-log.hidden {
-  display: none;
+/* 관리자 패널, 콘솔 */
+#admin-panel, #console-log, #online-users {
+  padding: 10px;
+  margin: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
 
-/* ────────────────────────────────────────── */
 /* 다크모드 */
 body.dark-mode {
-  background: #121212;
-  color: #eee;
-}
-body.dark-mode #auth-section,
-body.dark-mode .tab,
-body.dark-mode #chat-box,
-body.dark-mode #top-bar,
-body.dark-mode #tabs,
-body.dark-mode #bottom-buttons,
-body.dark-mode #admin-panel,
-body.dark-mode #theme-controls,
-body.dark-mode #online-users,
-body.dark-mode #console-log {
-  background: rgba(30,30,30,0.9);
-  color: #eee;
-}
-body.dark-mode #chat-form,
-body.dark-mode #chat-form input,
-body.dark-mode #chat-form button {
-  background: #333;
-  color: #fff;
-  border: 1px solid #555;
+  background: #222;
+  color: #ddd;
 }
 
-/* ────────────────────────────────────────── */
+body.dark-mode #top-nav,
+body.dark-mode #tabs {
+  background: #333;
+}
+
+body.dark-mode #chat-messages {
+  background: #333;
+  border-color: #555;
+}
+
+body.dark-mode #chat-form input {
+  background: #555;
+  color: white;
+  border: 1px solid #777;
+}
+
+body.dark-mode #chat-form button {
+  background: #666;
+}
+
+body.dark-mode #admin-panel,
+body.dark-mode #console-log,
+body.dark-mode #online-users {
+  background: #333;
+  border-color: #555;
+}
+
+/* 반응형 모바일 최적화 */
+@media (max-width: 600px) {
+  #chat-messages {
+    height: 300px;
+  }
+}
