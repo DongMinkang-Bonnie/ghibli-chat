@@ -1,47 +1,48 @@
-// particle 애니메이션 제어
+// 간단한 particle 애니메이션 예제 (지브리 감성을 위한)
+// 실제 완성도 높은 애니메이션은 Particle.js 라이브러리 등 추가 사용 필요
+
+function clearParticles() {
+  document.querySelectorAll('.particle').forEach(p => p.remove());
+}
+
+function createParticle(symbol, x, y, duration) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.innerText = symbol;
+  p.style.left = `${x}px`;
+  p.style.top = `${y}px`;
+  p.style.animationDuration = `${duration}s`;
+  document.body.appendChild(p);
+}
 
 function particlesRain() {
-    clearParticles();
-    for (let i = 0; i < 50; i++) {
-      createParticle('💧', Math.random() * window.innerWidth, Math.random() * window.innerHeight, 1);
-    }
+  clearParticles();
+  for (let i = 0; i < 50; i++) {
+    createParticle('💧', Math.random() * window.innerWidth, Math.random() * window.innerHeight, 3 + Math.random() * 2);
   }
-  
-  function particlesSnow() {
-    clearParticles();
-    for (let i = 0; i < 50; i++) {
-      createParticle('❄️', Math.random() * window.innerWidth, Math.random() * window.innerHeight, 2);
-    }
+}
+
+function particlesSnow() {
+  clearParticles();
+  for (let i = 0; i < 50; i++) {
+    createParticle('❄️', Math.random() * window.innerWidth, Math.random() * window.innerHeight, 5 + Math.random() * 3);
   }
-  
-  function createParticle(symbol, x, y, speed) {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.innerText = symbol;
-    particle.style.left = `${x}px`;
-    particle.style.top = `${y}px`;
-    particle.style.animationDuration = `${5 + Math.random() * 5}s`;
-    particle.dataset.speed = speed;
-    document.body.appendChild(particle);
-  }
-  
-  function clearParticles() {
-    const existingParticles = document.querySelectorAll('.particle');
-    existingParticles.forEach(p => p.remove());
-  }
-  
-  // 애니메이션 이동 제어
-  setInterval(() => {
-    const particles = document.querySelectorAll('.particle');
-    particles.forEach(p => {
-      let top = parseFloat(p.style.top);
-      let speed = parseFloat(p.dataset.speed);
-      top += speed;
-      if (top > window.innerHeight) {
-        top = -20;
-        p.style.left = `${Math.random() * window.innerWidth}px`;
-      }
-      p.style.top = `${top}px`;
-    });
-  }, 30);
-  
+}
+
+// CSS for particles (inject style dynamically)
+const style = document.createElement('style');
+style.innerHTML = `
+.particle {
+  position: fixed;
+  font-size: 24px;
+  pointer-events: none;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes fall {
+  0% { transform: translateY(0px); opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+`;
+document.head.appendChild(style);

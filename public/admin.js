@@ -1,28 +1,34 @@
-// 관리자 기능 모음
-
-// 전체 메시지 삭제
+// 관리자 패널 기능
 function deleteAllMessages() {
-    if (confirm('정말 모든 메시지를 삭제하시겠습니까?')) {
-      socket.emit('admin delete all');
-    }
+  if (confirm('정말 모든 메시지를 삭제하시겠습니까?')) {
+    socket.emit('admin delete all');
   }
-  
-  // 공지사항 보내기
-  function sendAnnouncement() {
-    const announcement = prompt('공지할 내용을 입력하세요:');
-    if (announcement) {
-      socket.emit('admin announce', announcement);
-    }
+}
+
+function sendAnnouncement() {
+  const announcement = prompt('공지사항 내용을 입력하세요:');
+  if (announcement) {
+    socket.emit('admin announce', announcement);
   }
-  
-  // 방 잠금/해제 기능 (간단 버전)
-  let roomLocked = false;
-  function lockRoom() {
-    roomLocked = !roomLocked;
-    if (roomLocked) {
-      alert('방이 잠겼습니다! (출입 제한)');
-    } else {
-      alert('방이 열렸습니다! (출입 가능)');
-    }
+}
+
+let roomLocked = false;
+function lockRoom() {
+  roomLocked = !roomLocked;
+  alert(roomLocked ? '방이 잠겼습니다!' : '방이 열렸습니다!');
+  // 추가 로직 (출입 제한) 필요 시 구현
+}
+
+function kickUser() {
+  const socketId = prompt('강퇴할 사용자의 소켓 ID를 입력하세요:');
+  if (socketId) {
+    socket.emit('admin kick', socketId);
   }
-  
+}
+
+function banUser() {
+  const userId = prompt('벤할 사용자의 아이디를 입력하세요:');
+  if (userId) {
+    socket.emit('admin ban', userId);
+  }
+}

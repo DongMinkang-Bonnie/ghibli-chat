@@ -1,158 +1,222 @@
 body {
-    margin: 0;
-    padding: 20px;
-    font-family: 'Noto Sans', Arial, sans-serif;
-    background: #dff5f5 url('default_background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    transition: background 1s, color 1s;
-    color: #333;
-  }
-  
-  .dark-mode {
-    background: #121212;
-    color: #eee;
-  }
-  
-  h1, h2, h3, h4 {
-    margin-bottom: 10px;
-  }
-  
-  input, button {
-    margin: 5px;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-  }
-  
-  input {
-    width: 70%;
-  }
-  
-  button {
-    background-color: #4caf50;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  #auth-section, #chat-section, #admin-login {
-    text-align: center;
-  }
-  
-  #messages {
-    list-style-type: none;
-    margin: 20px auto;
-    padding: 10px;
-    width: 90%;
-    max-width: 600px;
-    height: 400px;
-    overflow-y: auto;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 15px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  
-  #messages li {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    text-align: left;
-    font-size: 16px;
-    word-wrap: break-word;
-    animation: fadeIn 0.5s ease forwards;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  #chat-form {
-    margin-top: 20px;
-  }
-  
-  #messageInput {
-    width: 70%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: 1px solid #aaa;
-  }
-  
-  #chat-form button {
-    padding: 12px 20px;
-  }
-  
-  #admin-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #ff9800;
-  }
-  
-  #theme-buttons {
-    margin-top: 15px;
-  }
-  
-  #theme-buttons button {
-    background-color: #2196f3;
-  }
-  
-  #theme-buttons button:hover {
-    background-color: #1976d2;
-  }
-  
-  #darkmode-toggle {
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    background-color: #333;
-  }
-  
-  #show-users-button {
-    position: fixed;
-    bottom: 140px;
-    right: 20px;
-    background-color: #673ab7;
-  }
-  
-  #online-users {
-    display: none;
-    position: absolute;
-    top: 100px;
-    right: 50px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 15px;
-    width: 250px;
-    text-align: left;
-    z-index: 1000;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  }
-  
-  #admin-panel {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-  }
-  
-  #admin-login {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  }
-  
+  margin: 0;
+  padding: 20px;
+  font-family: 'Noto Sans', Arial, sans-serif;
+  background: #dff5f5 url('https://cdn.pixabay.com/photo/2017/07/27/20/50/summer-2543238_960_720.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #333;
+  transition: background 0.5s, color 0.5s;
+}
+
+.dark-mode {
+  background: #121212 url('https://cdn.pixabay.com/photo/2017/06/07/08/28/night-2380278_960_720.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #ddd;
+}
+
+h1, h2, h3, h4 {
+  margin-bottom: 10px;
+}
+
+input, button {
+  margin: 5px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+input {
+  width: 70%;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* 인증 섹션 */
+#auth-section {
+  text-align: center;
+}
+
+/* 채팅 섹션 */
+#chat-section {
+  display: block;
+}
+
+#profile-bar {
+  background: rgba(255,255,255,0.8);
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* 채팅창 컨테이너: 카카오톡 스타일 (하단 고정, 채팅이 위로 올라감) */
+#chat-container {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  height: 500px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  overflow-y: auto;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* 채팅 메시지 말풍선 스타일 */
+#messages {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#messages li {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 15px;
+  max-width: 80%;
+  position: relative;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 오른쪽 정렬 (내가 보낸 메시지) */
+.message-right {
+  margin-left: auto;
+  background: #dcf8c6;
+}
+
+/* 왼쪽 정렬 (다른 사람 메시지) */
+.message-left {
+  margin-right: auto;
+  background: #ffffff;
+}
+
+/* 시간 및 발신자 정보 (작은 글씨) */
+.message-info {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+  text-align: right;
+}
+
+/* 폰, 배경, 버튼 등 추가 스타일 */
+#admin-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff9800;
+}
+
+#theme-buttons {
+  margin-top: 15px;
+}
+
+#theme-buttons button {
+  background-color: #2196f3;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  margin: 2px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#theme-buttons button:hover {
+  background-color: #1976d2;
+}
+
+#darkmode-toggle {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background-color: #333;
+  color: white;
+}
+
+#show-users-button {
+  position: fixed;
+  bottom: 140px;
+  right: 20px;
+  background-color: #673ab7;
+}
+
+#online-users {
+  display: none;
+  position: absolute;
+  top: 100px;
+  right: 50px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  width: 250px;
+  text-align: left;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+#admin-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.9);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+#admin-login {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+#profile-settings {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+/* 개발자 콘솔 */
+#dev-console {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.8);
+  color: #0f0;
+  font-family: monospace;
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 2000;
+}
+
+#console-log {
+  font-size: 12px;
+}
